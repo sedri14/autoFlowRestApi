@@ -18,27 +18,7 @@ import java.util.UUID;
 public class AuthenticationService {
     @Autowired
     private UserRepository userRepo;
-    Map<String, User> userTokens;
-
-    private AuthenticationService() {
-        this.userTokens = new HashMap<>();
-        //userRepo = UserRepository.getInstance();
-    }
-
-//    public static AuthenticationService getInstance() {
-//
-//        AuthenticationService result = authService;
-//
-//        if (result == null) {
-//            synchronized (AuthenticationService.class) {
-//                result = authService;
-//                if (result == null) {
-//                    authService = result = new AuthenticationService();
-//                }
-//            }
-//        }
-//        return result;
-//    }
+    Map<String, User> userTokens = new HashMap<>();
 
     public User register(User user) {
 
@@ -51,7 +31,7 @@ public class AuthenticationService {
                 System.out.println("Couldn't write to file");
                 throw new RuntimeException(e);
             }
-        }else{
+        } else {
             return null;
         }
     }
@@ -89,25 +69,16 @@ public class AuthenticationService {
         userTokens.remove(token);
     }
 
-    public void addToken(String token, User user){
-        userTokens.put(token,user);
+    public void addToken(String token, User user) {
+        userTokens.put(token, user);
     }
 
-    public User getUserByEmail(String email){
+    public User getUserByEmail(String email) {
         return userRepo.getUserByEmail(email);
     }
 
     public boolean checkIfUserExists(String email) {
-
         return userRepo.isUserExists(email);
-//        try (FileReader fr = new FileReader(email + ".json")) {
-//        } catch (FileNotFoundException e) {
-//            return false;
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        return true;
     }
 }
 

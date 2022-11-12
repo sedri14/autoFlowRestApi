@@ -1,11 +1,16 @@
 package com.example.AuthProjectSpringboot.Controllers;
 
+import com.example.AuthProjectSpringboot.DTO.UserUpdateDTO;
 import com.example.AuthProjectSpringboot.Entities.User;
 import com.example.AuthProjectSpringboot.Services.AuthenticationService;
 import com.example.AuthProjectSpringboot.Services.UserService;
 import com.example.AuthProjectSpringboot.Utils.Utils;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -20,62 +25,80 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    public UserController() {
-        //this.authService = AuthenticationService.getInstance();
-        //this.userService = UserService.getInstance();
+    @RequestMapping(value = "/update/email", method = RequestMethod.PATCH, consumes = "application/json")
+    public ResponseEntity<User> updateEmail(@RequestBody UserUpdateDTO userUpdate) throws IOException {
+
+        String token = userUpdate.token;
+        String newEmail = userUpdate.email;
+
+        if (!Utils.isEmailValid(newEmail)) {
+            return ResponseEntity.badRequest().header("errorMessage", "email in wrong format").build();
+        }
+
+        User user;
+        try {
+            user = authService.validate(token);
+        } catch (InvalidParameterException e) {
+            return ResponseEntity.badRequest().header("errorMessage", e.getMessage()).build();
+        }
+
+        user = userService.updateEmail(user, newEmail);    //update user in repository
+        authService.reloadUser(newEmail, token);           //update user in cache
+
+        return ResponseEntity.ok(user);
     }
 
+    @RequestMapping(value = "/update/name", method = RequestMethod.PATCH, consumes = "application/json")
+    public ResponseEntity<User> updateName(@RequestBody UserUpdateDTO userUpdate) throws IOException {
+        String token = userUpdate.token;
+        String newName = userUpdate.name;
 
+        if (!Utils.isNameValid(newName)) {
+            return ResponseEntity.badRequest().header("errorMessage", "name in wrong format").build();
+        }
 
-    public boolean updateEmail(String mail, String token) throws IOException {
-        try{
-            Utils.isEmailValid(mail);
-        }catch (InvalidParameterException ip){
-            throw new InvalidParameterException("Email not in correct format");
+        User user;
+        try {
+            user = authService.validate(token);
+        } catch (InvalidParameterException e) {
+            return ResponseEntity.badRequest().header("errorMessage", e.getMessage()).build();
         }
-        User user = authService.validate(token);
-        boolean status = userService.updateEmail(user, mail);
-        if (status) {
-            authService.reloadUser(mail, token);
-        }
-        return status;
+
+        user = userService.updateName(user, newName);
+        authService.reloadUser(user.getEmail(), token);
+
+        return ResponseEntity.ok(user);
     }
 
-    public boolean updateName(String name, String token) throws IOException {
-        try{
-            Utils.isNameValid(name);
-        }catch (InvalidParameterException ip){
-            throw new InvalidParameterException("Name not in correct format");
+    @RequestMapping(value = "/update/password", method = RequestMethod.PATCH, consumes = "application/json")
+    public ResponseEntity<User> updatePassword(@RequestBody UserUpdateDTO userUpdate) throws IOException {
+        String token = userUpdate.token;
+        String newPassword = userUpdate.password;
+
+        if (!Utils.isPasswordValid(newPassword)) {
+            return ResponseEntity.badRequest().header("errorMessage", "password in wrong format").build();
         }
-        User user = authService.validate(token);
-        boolean status = userService.updateName(user, name);
-        if (status) {
-            authService.reloadUser(user.getEmail(), token);
+
+        User user;
+        try {
+            user = authService.validate(token);
+        } catch (InvalidParameterException e) {
+            return ResponseEntity.badRequest().header("errorMessage", e.getMessage()).build();
         }
-        return status;
-    }
-    public boolean updatePassword(String password, String token) throws IOException {
-        try{
-            Utils.isPasswordValid(password);
-        }catch (InvalidParameterException ip){
-            throw new InvalidParameterException("Email not in correct format");
-        }
-        User user = authService.validate(token);
-        boolean status = userService.updatePassword(user, password);
-        if (status) {
-            authService.reloadUser(user.getEmail(), token);
-        }
-        return status;
+
+        user = userService.updatePassword(user, newPassword);
+        authService.reloadUser(user.getEmail(), token);
+
+        return ResponseEntity.ok(user);
     }
 
-    public boolean deleteUser(String token){
-        User user = authService.validate(token);
-        boolean status = userService.deleteUser(user);
-        if (status) {
-            authService.removeToken(token);
-        }
-        return status;
-    }
+//    public boolean deleteUser(String token) {
+//        User user = authService.validate(token);
+//        userService.deleteUser(user);
+//        authService.removeToken(token);
+//
+//        return true;
+//    }
 
 }
 

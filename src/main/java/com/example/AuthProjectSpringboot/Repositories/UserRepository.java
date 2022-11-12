@@ -11,28 +11,10 @@ import java.util.Map;
 
 @Repository
 public class UserRepository {
-    //private static volatile UserRepository userRepo;
     private Map<String, User> usersCache = new HashMap<>();
 
-//    public static UserRepository getInstance() {
-//
-//        UserRepository result = userRepo;
-//
-//        if (result == null) {
-//            synchronized (UserRepository.class) {
-//                result = userRepo;
-//                if (result == null) {
-//                    userRepo = result = new UserRepository();
-//                }
-//            }
-//        }
-//        return result;
-//    }
-
     private UserRepository() {
-        //usersCache = new HashMap<>();
         loadAllUsersToCache(new File("src\\main\\java\\com\\example\\AuthProjectSpringboot\\users\\"));
-
     }
 
     public User readFromCache(String email) {
@@ -58,8 +40,8 @@ public class UserRepository {
     }
 
     public void deleteFile(String path) {
-        File file = new File("src\\main\\java\\com\\example\\AuthProjectSpringboot\\users" + path);
-        boolean b = file.delete();
+        File file = new File("src\\main\\java\\com\\example\\AuthProjectSpringboot\\users\\" + path);
+        file.delete();
     }
 
     public void deleteFile(User user) {

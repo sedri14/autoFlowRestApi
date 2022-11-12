@@ -17,10 +17,6 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationService authService;
 
-    public AuthenticationController() {
-        //this.authService = AuthenticationService.getInstance();
-    }
-
     @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<String> login(@RequestBody UserLoginDTO login) {
         String email = login.email;
@@ -44,11 +40,7 @@ public class AuthenticationController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<User> register(@RequestBody User user) {
-        System.out.println(user.email);
-        System.out.println(user.name);
-        System.out.println(user.password);
         if (!Utils.isEmailValid(user.email) || !Utils.isNameValid(user.name) || !Utils.isPasswordValid(user.password)){
-            System.out.println("before bad request");
             return ResponseEntity.badRequest().header("errorMessage","registration failed. details are not in correct format").build();
         }
 
@@ -56,13 +48,7 @@ public class AuthenticationController {
         if (registeredUser == null) {
             return ResponseEntity.badRequest().header("errorMessage", "Email already exists").build();
         }
-        System.out.println("before ok");
-        return ResponseEntity.ok(registeredUser);
-    }
 
-    //test
-    @RequestMapping(value = "/hello", method = RequestMethod.GET)
-    public ResponseEntity<String> sayHello(){
-        return ResponseEntity.ok("hello");
+        return ResponseEntity.ok(registeredUser);
     }
 }

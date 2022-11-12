@@ -13,53 +13,34 @@ public class UserService {
     @Autowired
     private UserRepository userRepo;
 
-    private UserService() {
-        //userRepo = UserRepository.getInstance();
-    }
-
-//    public static UserService getInstance() {
-//
-//        UserService result = userService;
-//
-//        if (result == null) {
-//            synchronized (UserService.class) {
-//                result = userService;
-//                if (result == null) {
-//                    userService = result = new UserService();
-//                }
-//            }
-//        }
-//        return result;
-//    }
-
     boolean createUser(User user) {
         return true;
     }
 
-    public boolean updateEmail(User user, String updatedEmail) throws IOException {
+    public User updateEmail(User user, String updatedEmail) throws IOException {
         userRepo.deleteFile(user);
         User newUser = new User(user.getId(), updatedEmail, user.getName(), user.getPassword());
         updateData(newUser);
-        return true;
+        return newUser;
     }
 
-    public boolean updateName(User user, String updatedName) throws IOException {
+    public User updateName(User user, String updatedName) throws IOException {
         userRepo.deleteFile(user);
         User newUser = new User(user.getId(), user.getEmail(), updatedName, user.getPassword());
         updateData(newUser);
-        return true;
+        return newUser;
     }
 
-    public boolean updatePassword(User user, String updatedPassword) throws IOException {
+    public User updatePassword(User user, String updatedPassword) throws IOException {
         userRepo.deleteFile(user);
         User newUser = new User(user.getId(), user.getEmail(), user.getName(), updatedPassword);
         updateData(newUser);
-        return true;
+        return newUser;
     }
 
-    public boolean deleteUser(User user) {
+    public User deleteUser(User user) {
         userRepo.deleteFile(user);
-        return true;
+        return user;
     }
 
 
